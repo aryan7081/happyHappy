@@ -1,15 +1,20 @@
-asgiref==3.8.1
-certifi==2025.4.26
-charset-normalizer==3.4.2
+# Django
 Django==5.2.3
+djangorestframework==3.16.0
 django-cors-headers==4.7.0
 django-environ==0.12.0
-djangorestframework==3.16.0
-idna==3.10
-pillow==11.2.1
-psycopg2==2.9.10
+
+# Database (use binary for deployment - no libpq build required)
+psycopg2-binary==2.9.10
+
+# Media / images
+Pillow==11.2.1
+
+# Payments
 razorpay==1.4.2
-requests==2.32.4
-setuptools==80.9.0
-sqlparse==0.5.3
-urllib3==2.4.0
+
+# Production WSGI server
+gunicorn==23.0.0
+
+# Static files in production (optional; add to MIDDLEWARE if using)
+whitenoise==6.8.2

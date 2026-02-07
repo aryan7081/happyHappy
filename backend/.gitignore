@@ -1,3 +1,4 @@
 /myenv/
 /backendenv
 .env
+.env.example
