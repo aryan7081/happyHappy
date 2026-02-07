@@ -2,7 +2,6 @@ import React, { useContext, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../context/AuthContext'
 import { MembershipContext } from '../context/MembershipContext'
-import Button from '../components/Button'
 import config from '../config'
 import { X } from 'lucide-react';
 
@@ -13,7 +12,7 @@ const Login = ({closeModals, openRegisterModal}) => {
     if (token) {
       navigate("/dashboard");
     }
-  }, []);
+  }, [navigate]);
   const { login } = useContext(AuthContext)
   const { isSubscribedMember, checkMembershipStatus } = useContext(MembershipContext)
   const [email, setEmail] = useState('')
@@ -105,9 +104,9 @@ const Login = ({closeModals, openRegisterModal}) => {
                   <input type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500" />
                   <span className="ml-2 text-sm text-gray-600">Remember me</span>
                 </label>
-                <a href="#" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                <button type="button" className="text-sm text-blue-600 hover:text-blue-700 font-medium bg-transparent border-0 p-0 cursor-pointer">
                   Forgot password?
-                </a>
+                </button>
               </div>
 
               <button

@@ -1,5 +1,4 @@
 import React, {useContext, useState, useEffect} from 'react';
-import { User, Bell, Settings, LogOut, LogIn, Dumbbell } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import { useNavigate } from "react-router-dom";
 import config from '../../config'

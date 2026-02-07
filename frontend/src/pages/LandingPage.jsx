@@ -2,10 +2,6 @@ import React, { useState, useEffect, useContext } from 'react';
 import Login from '../modals/Login';
 import Signup from '../modals/Signup';
 import { 
-  Bell, 
-  Settings, 
-  User, 
-  LogIn,
   Dumbbell, 
   Star,
   Clock,
@@ -14,12 +10,9 @@ import {
   CheckCircle,
   ArrowRight,
   Play,
-  Calendar,
   Target,
   TrendingUp,
   Heart,
-  Shield,
-  Zap,
   Phone,
   Mail,
   MapPin,
@@ -195,52 +188,6 @@ const LandingPage = () => {
       image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face'
     }
   ];
-  console.log("seeeefedcs", availablePlans)
-  const plans = [
-    {
-      name: 'Basic',
-      price: '$29',
-      period: '/month',
-      description: 'Perfect for beginners',
-      features: [
-        'Gym access during regular hours',
-        'Basic equipment usage',
-        'Locker room access',
-        'Mobile app access'
-      ]
-    },
-    {
-      name: 'Standard',
-      price: '$49',
-      period: '/month',
-      description: 'Most popular choice',
-      features: [
-        '24/7 gym access',
-        'All equipment & facilities',
-        'Group classes included',
-        'Personal training consultation',
-        'Nutrition guidance',
-        'Progress tracking'
-      ],
-      popular: true
-    },
-    {
-      name: 'Premium',
-      price: '$79',
-      period: '/month',
-      description: 'For serious athletes',
-      features: [
-        'Everything in Standard',
-        'Unlimited personal training',
-        'VIP locker room access',
-        'Massage therapy sessions',
-        'Meal planning service',
-        'Priority class booking'
-      ],
-      popular: false
-    }
-  ];
-
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -592,9 +539,9 @@ const LandingPage = () => {
               <ul className="space-y-3">
                 {['About Us', 'Classes', 'Trainers', 'Membership', 'Contact'].map((link) => (
                   <li key={link}>
-                    <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    <button type="button" className="text-gray-400 hover:text-white transition-colors bg-transparent border-0 p-0 cursor-pointer text-left">
                       {link}
-                    </a>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -606,9 +553,9 @@ const LandingPage = () => {
               <ul className="space-y-3">
                 {['Personal Training', 'Group Classes', 'Nutrition Coaching', 'Fitness Assessment', 'Recovery Therapy'].map((service) => (
                   <li key={service}>
-                    <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    <button type="button" className="text-gray-400 hover:text-white transition-colors bg-transparent border-0 p-0 cursor-pointer text-left">
                       {service}
-                    </a>
+                    </button>
                   </li>
                 ))}
               </ul>

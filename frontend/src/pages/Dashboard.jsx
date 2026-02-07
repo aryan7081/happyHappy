@@ -1,9 +1,7 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { MembershipContext } from '../context/MembershipContext';
-import Membership from '../components/Membership';
 import { useNavigate } from "react-router-dom";
-import PremiumMember from '../components/PremiumMember';
 import config from '../config'
 import { CheckCircle } from 'lucide-react';
 
@@ -15,7 +13,7 @@ const Dashboard = () => {
     };
   }, []);
   const { user, isAuthenticated } = useContext(AuthContext);
-  const { isSubscribedMember, membershipDetail, checkMembershipStatus, availablePlans, fetchAvailablePlans } = useContext(MembershipContext);
+  const { isSubscribedMember, checkMembershipStatus, availablePlans, fetchAvailablePlans } = useContext(MembershipContext);
 
   useEffect(() => {
     fetchAvailablePlans();
@@ -47,13 +45,7 @@ const Dashboard = () => {
     if (isAuthenticated && user?.token) {
       checkMembershipStatus(user.token);
     }
-  }, [isAuthenticated, user, checkMembershipStatus]);
-
-  useEffect(() => {
-    if (isAuthenticated && user?.token) {
-      checkMembershipStatus(user.token);
-    }
-  }, []);
+  }, [isAuthenticated, user?.token, checkMembershipStatus]);
 
   if (!isAuthenticated) {
     return (

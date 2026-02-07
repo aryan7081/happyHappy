@@ -1,11 +1,8 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import Button from '../components/Button'
 import config from '../config'
 import { X } from 'lucide-react';
 
 const Signup = ({openLoginModal, closeModals}) => {
-  const navigate = useNavigate()
   const [fullname, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')

@@ -26,18 +26,18 @@ const Footer = () => {
         <div className="flex flex-col gap-2">
           <h3 className="text-lg font-semibold mb-1">Connect With Us</h3>
           <div className="flex gap-4 mt-2">
-            <a href="#" className="hover:text-violet-400 transition">
+            <button type="button" aria-label="Facebook" className="hover:text-violet-400 transition bg-transparent border-0 p-0 cursor-pointer text-inherit">
               <FaFacebookF size={18} />
-            </a>
-            <a href="#" className="hover:text-violet-400 transition">
+            </button>
+            <button type="button" aria-label="Instagram" className="hover:text-violet-400 transition bg-transparent border-0 p-0 cursor-pointer text-inherit">
               <FaInstagram size={18} />
-            </a>
-            <a href="#" className="hover:text-violet-400 transition">
+            </button>
+            <button type="button" aria-label="Twitter" className="hover:text-violet-400 transition bg-transparent border-0 p-0 cursor-pointer text-inherit">
               <FaTwitter size={18} />
-            </a>
-            <a href="#" className="hover:text-violet-400 transition">
+            </button>
+            <button type="button" aria-label="LinkedIn" className="hover:text-violet-400 transition bg-transparent border-0 p-0 cursor-pointer text-inherit">
               <FaLinkedin size={18} />
-            </a>
+            </button>
           </div>
         </div>
       </div>

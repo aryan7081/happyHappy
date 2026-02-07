@@ -1,4 +1,3 @@
-import Navbar from "./components/Navbar";
 import Login from "./modals/Login";
 import Signup from "./modals/Signup";
 import {AuthProvider} from "./context/AuthContext";
@@ -7,7 +6,6 @@ import LandingPage from "./pages/LandingPage";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Payment from "./pages/Payment";
-import Footer from "./components/Footer";
 import {GymDashboard} from "./components/layoutComponents/GymDashboard";
 import { Header } from "./components/layoutComponents/Header";
 

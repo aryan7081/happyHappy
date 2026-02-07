@@ -6,7 +6,7 @@ import { CreditCard, Smartphone, Building, CheckCircle } from 'lucide-react';
 
 export default function Payment() {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const membership_id = queryParams.get("membership_id");

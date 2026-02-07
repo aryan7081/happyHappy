@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Header } from './Header';
 import { Navigation } from './Navigation';
 import { OverviewTab } from '../../pages/OverviewTab';
 import { MembershipTab } from '../../pages/MembershipTab';
@@ -7,25 +6,17 @@ import { WorkoutsTab } from '../../pages/WorkoutsTab';
 import { ClassesTab } from '../../pages/ClassesTab';
 import { AuthContext } from '../../context/AuthContext';
 import { MembershipContext } from '../../context/MembershipContext';
-import { useNavigate } from "react-router-dom";
 
 export const GymDashboard = () => {
-    const navigate = useNavigate()
     const [activeTab, setActiveTab] = useState('overview');
     const { user, isAuthenticated } = useContext(AuthContext);
-    const { isSubscribedMember, membershipDetail, checkMembershipStatus } = useContext(MembershipContext);
+    const { membershipDetail, checkMembershipStatus } = useContext(MembershipContext);
     
     useEffect(() => {
         if (isAuthenticated && user?.token) {
           checkMembershipStatus(user.token);
         }
-      }, [isAuthenticated, user, checkMembershipStatus]);
-    
-      useEffect(() => {
-        if (isAuthenticated && user?.token) {
-          checkMembershipStatus(user.token);
-        }
-      }, []);
+      }, [isAuthenticated, user?.token, checkMembershipStatus]);
   
     const membershipPlans = [
       {
