@@ -91,9 +91,16 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-# On Render: use DATABASE_URL (set automatically when you add a PostgreSQL instance).
-# Locally: use .env with DATABASE_NAME, USER, PASSWORD, HOST, PORT.
-if env('DATABASE_URL', default=None):
+# Use SQLite for tests (CI); otherwise PostgreSQL.
+import sys
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }
+elif env('DATABASE_URL', default=None):
     DATABASES = {'default': env.db()}
 else:
     DATABASES = {
