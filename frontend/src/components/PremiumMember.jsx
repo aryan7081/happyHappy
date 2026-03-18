@@ -1,8 +1,8 @@
 import React from 'react';
-import { FaCalendarAlt, FaRegClock } from "react-icons/fa";
+import { FaCalendarAlt, FaRegClock } from 'react-icons/fa';
 
 const PremiumMember = ({ name, membershipPlan, dateJoined, expiryDate }) => {
-  console.log("this:",name)
+  console.log('this:', name);
   return (
     <div className="h-screen flex flex-col justify-center items-center bg-black text-white px-4">
       {/* Top Section */}
@@ -18,7 +18,9 @@ const PremiumMember = ({ name, membershipPlan, dateJoined, expiryDate }) => {
 
         {/* Profile Info */}
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-yellow-300 tracking-wide">{name}</h2>
+          <h2 className="text-2xl font-bold text-yellow-300 tracking-wide">
+            {name}
+          </h2>
           <p className="text-sm text-gray-400 mt-1">{membershipPlan} Plan</p>
         </div>
       </div>
@@ -30,11 +32,15 @@ const PremiumMember = ({ name, membershipPlan, dateJoined, expiryDate }) => {
       <div className="space-y-4 text-center">
         <div className="flex items-center justify-center gap-3 text-gray-300">
           <FaCalendarAlt className="text-yellow-300" />
-          <p className="text-sm">Member Since: <span className="text-white">{dateJoined}</span></p>
+          <p className="text-sm">
+            Member Since: <span className="text-white">{dateJoined}</span>
+          </p>
         </div>
         <div className="flex items-center justify-center gap-3 text-gray-300">
           <FaRegClock className="text-yellow-300" />
-          <p className="text-sm">Next Billing: <span className="text-white">{expiryDate}</span></p>
+          <p className="text-sm">
+            Next Billing: <span className="text-white">{expiryDate}</span>
+          </p>
         </div>
       </div>
     </div>

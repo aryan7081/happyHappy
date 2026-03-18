@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 
 const images = [
-  "/assets/gallery01.jpeg",
-  "/assets/gallery02.jpeg",
-  "/assets/gallery03.jpeg",
-  "/assets/gallery04.jpeg",
-  "/assets/gallery05.jpeg",
-  "/assets/gallery05.jpeg",
+  '/assets/gallery01.jpeg',
+  '/assets/gallery02.jpeg',
+  '/assets/gallery03.jpeg',
+  '/assets/gallery04.jpeg',
+  '/assets/gallery05.jpeg',
+  '/assets/gallery05.jpeg',
 ];
 
 const GymGallery = () => {
@@ -15,7 +15,7 @@ const GymGallery = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      const gallery = document.getElementById("gallery");
+      const gallery = document.getElementById('gallery');
       if (gallery) {
         const rect = gallery.getBoundingClientRect();
         if (rect.top < window.innerHeight * 0.75) {
@@ -24,8 +24,8 @@ const GymGallery = () => {
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
@@ -40,7 +40,11 @@ const GymGallery = () => {
             animate={showGallery ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, delay: index * 0.2 }}
           >
-            <img src={src} alt={`Gym ${index + 1}`} className="w-full h-60 object-cover" />
+            <img
+              src={src}
+              alt={`Gym ${index + 1}`}
+              className="w-full h-60 object-cover"
+            />
           </motion.div>
         ))}
       </div>

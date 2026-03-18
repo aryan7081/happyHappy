@@ -1,9 +1,15 @@
-import React from 'react'
+import React from 'react';
 
-const Membership = ({ membershipPlanName, price, description, duration, handleBuy, planId }) => {
+const Membership = ({
+  membershipPlanName,
+  price,
+  description,
+  duration,
+  handleBuy,
+  planId,
+}) => {
   return (
     <div className="w-72 flex flex-col rounded-2xl bg-[#1a1a1a] text-white shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-      
       {/* Header */}
       <div className="flex flex-col items-center gap-2 py-6 border-b border-gray-700">
         <h3 className="text-lg font-semibold">{membershipPlanName}</h3>
@@ -28,7 +34,7 @@ const Membership = ({ membershipPlanName, price, description, duration, handleBu
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Membership
+export default Membership;
