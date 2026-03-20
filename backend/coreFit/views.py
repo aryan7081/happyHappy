@@ -1,6 +1,4 @@
-from django.shortcuts import render
-from .models import CustomUser
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from rest_framework.generics import CreateAPIView
 from .serializers import SignupSerializer, LoginSerializer
 from rest_framework.response import Response
@@ -10,23 +8,20 @@ from rest_framework.authtoken.models import Token
 from rest_framework import status
 from .models import MembershipPlan, Membership, Payment
 from .serializers import MembershipPlanSerializer, MembershipSerializer, PaymentSerializer
-from django.urls import path, include
 from django.views.decorators.csrf import csrf_exempt
 import json
-from rest_framework.routers import DefaultRouter
-from django.utils.timezone import now  # To handle datetime operations
-from datetime import timedelta  # To calculate membership duration
+from django.utils.timezone import now
+from datetime import timedelta
 import razorpay
 from django.conf import settings
-from rest_framework import viewsets, status  # DRF viewsets & status codes
-from rest_framework.response import Response  # DRF response handling
-from rest_framework.permissions import IsAuthenticated 
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 import uuid
 
 class SignupView(CreateAPIView):
     serializer_class = SignupSerializer
     def create(self, request):
-        serializer = self.get_serializer(data = request.data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             return Response({
@@ -60,13 +55,14 @@ class LoginApiView(APIView):
                 "email": user.email
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
 class LogoutView(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated] 
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        request.auth.delete() 
+        request.auth.delete()
         return Response({"message": "Logged out successfully"}, status=200)
 
 # ✅ Membership Plan Viewset (CRUD)
@@ -117,7 +113,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         membership_id = request.data.get("membership_id")
         amount = int(float(request.data.get("amount")) * 100)
         payment_method = request.data.get("payment_method")
-        
+
         try:
             membership = Membership.objects.get(id=membership_id, user=user)
         except Membership.DoesNotExist:
@@ -132,11 +128,10 @@ class PaymentViewSet(viewsets.ModelViewSet):
             "payment_capture": "1"
         })
 
-
-        payment = Payment.objects.create(
+        Payment.objects.create(
             user=user,
             membership=membership,
-            amount=amount/100,
+            amount=amount / 100,
             payment_method=payment_method,
             transaction_id=transaction_id,
             status="pending"
@@ -149,12 +144,11 @@ class PaymentViewSet(viewsets.ModelViewSet):
             "currency": "INR",
             "transaction_id": transaction_id
         }, status=status.HTTP_201_CREATED)
-    
+
+
 @csrf_exempt
 def verify_payment(request):
     if request.method == "POST":
-        
-
         try:
             data = json.loads(request.body)
             params_dict = {
@@ -165,7 +159,7 @@ def verify_payment(request):
 
             client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
             client.utility.verify_payment_signature(params_dict)
-            
+
             # Update payment status in DB
             payment = Payment.objects.get(transaction_id=data.get("transaction_id"))
             payment.status = "success"
@@ -177,9 +171,9 @@ def verify_payment(request):
             payment.membership.save()
 
             return JsonResponse({"message": "Payment verified successfully"}, status=status.HTTP_200_OK)
-        except:
+        except Exception:
             return JsonResponse({"error": "Invalid payment signature"}, status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 class MembershipStatusView(APIView):
     authentication_classes = [TokenAuthentication]

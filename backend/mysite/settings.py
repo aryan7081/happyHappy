@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import sys
 import environ
 env = environ.Env()
 
@@ -91,9 +92,15 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-# On Render: use DATABASE_URL (set automatically when you add a PostgreSQL instance).
-# Locally: use .env with DATABASE_NAME, USER, PASSWORD, HOST, PORT.
-if env('DATABASE_URL', default=None):
+# Use SQLite for tests (CI); otherwise PostgreSQL.
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }
+elif env('DATABASE_URL', default=None):
     DATABASES = {'default': env.db()}
 else:
     DATABASES = {
@@ -110,7 +117,7 @@ else:
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication', # or 'rest_framework.authentication.BearerTokenAuthentication'
+        'rest_framework.authentication.TokenAuthentication',  # BearerTokenAuthentication
     ],
 }
 
