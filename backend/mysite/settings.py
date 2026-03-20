@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import sys
 import environ
 env = environ.Env()
 
@@ -92,7 +93,6 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 # Use SQLite for tests (CI); otherwise PostgreSQL.
-import sys
 if 'test' in sys.argv:
     DATABASES = {
         'default': {
@@ -117,7 +117,7 @@ else:
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication', # or 'rest_framework.authentication.BearerTokenAuthentication'
+        'rest_framework.authentication.TokenAuthentication',  # BearerTokenAuthentication
     ],
 }
 
