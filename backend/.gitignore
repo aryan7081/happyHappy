@@ -2,3 +2,4 @@
 /backendenv
 .env
 .env.example
+__pycache__/
