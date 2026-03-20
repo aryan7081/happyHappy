@@ -18,10 +18,12 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /home/ubuntu/app
+            cd /home/ec2-user/happyHappy
             git pull origin main || git pull origin master
             mkdir -p backend/staticfiles backend/media
-            cd backend && pip install -r requirements.txt
+            cd backend
+            source venv/bin/activate
+            pip install -r requirements.txt
             python manage.py migrate --no-input
             python manage.py collectstatic --no-input --clear
             sudo systemctl restart corefit || true
