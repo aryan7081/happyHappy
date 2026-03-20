@@ -14,7 +14,7 @@ Pillow==11.2.1
 razorpay==1.4.2
 
 # Production WSGI server
-gunicorn==23.0.0
+gunicorn==25.1.0
 
 # Static files in production (optional; add to MIDDLEWARE if using)
 whitenoise==6.8.2
