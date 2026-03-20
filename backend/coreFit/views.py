@@ -1,6 +1,4 @@
-from django.shortcuts import render
-from .models import CustomUser
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from rest_framework.generics import CreateAPIView
 from .serializers import SignupSerializer, LoginSerializer
 from rest_framework.response import Response
@@ -10,23 +8,20 @@ from rest_framework.authtoken.models import Token
 from rest_framework import status
 from .models import MembershipPlan, Membership, Payment
 from .serializers import MembershipPlanSerializer, MembershipSerializer, PaymentSerializer
-from django.urls import path, include
 from django.views.decorators.csrf import csrf_exempt
 import json
-from rest_framework.routers import DefaultRouter
-from django.utils.timezone import now  # To handle datetime operations
-from datetime import timedelta  # To calculate membership duration
+from django.utils.timezone import now
+from datetime import timedelta
 import razorpay
 from django.conf import settings
-from rest_framework import viewsets, status  # DRF viewsets & status codes
-from rest_framework.response import Response  # DRF response handling
-from rest_framework.permissions import IsAuthenticated 
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 import uuid
 
 class SignupView(CreateAPIView):
     serializer_class = SignupSerializer
     def create(self, request):
-        serializer = self.get_serializer(data = request.data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             return Response({
@@ -118,7 +113,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
         membership_id = request.data.get("membership_id")
         amount = int(float(request.data.get("amount")) * 100)
         payment_method = request.data.get("payment_method")
-        
+
         try:
             membership = Membership.objects.get(id=membership_id, user=user)
         except Membership.DoesNotExist:
@@ -133,7 +128,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
             "payment_capture": "1"
         })
 
-        payment = Payment.objects.create(
+        Payment.objects.create(
             user=user,
             membership=membership,
             amount=amount / 100,
@@ -149,7 +144,6 @@ class PaymentViewSet(viewsets.ModelViewSet):
             "currency": "INR",
             "transaction_id": transaction_id
         }, status=status.HTTP_201_CREATED)
-
 
 
 @csrf_exempt

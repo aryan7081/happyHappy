@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CustomUser, Payment, Membership,MembershipPlan, MembershipFeature
+from .models import CustomUser, Payment, Membership, MembershipPlan, MembershipFeature
 from django.contrib.admin import AdminSite
 from .forms import CustomAdminAuthenticationForm
 from django.contrib.auth.models import Group
