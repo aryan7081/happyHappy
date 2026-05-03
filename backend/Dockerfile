@@ -16,8 +16,9 @@ WORKDIR /app
 
 COPY --from=builder /wheels /wheels
 COPY requirements.txt .
-RUN pip install --no-cache-dir /wheels/* \
-    && rm -rf /wheels
+RUN pip install --no-cache-dir /wheels/*.whl || true
+RUN pip install --no-cache-dir -r requirements.txt
+RUN rm -rf /wheels
 
 COPY manage.py .
 COPY mysite/ ./mysite/
