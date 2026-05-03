@@ -1,0 +1,15 @@
+__pycache__
+*.pyc
+.env
+.env.*
+venv
+.venv
+db.sqlite3
+staticfiles
+media
+.git
+*.md
+.pytest_cache
+.coverage
+htmlcov
+test-results

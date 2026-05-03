@@ -1,0 +1,56 @@
+# Phase 3 — Docker build, push to ECR, deploy to ECS Fargate
+name: ECS Deploy
+
+on:
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  # Must match terraform default project_name unless you change it
+  PROJECT_NAME: corefit
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set image tag
+        id: meta
+        run: echo "IMAGE_URI=${{ steps.ecr.outputs.registry }}/${{ env.PROJECT_NAME }}-backend:${{ github.sha }}" >> $GITHUB_OUTPUT
+
+      - name: Build and push Docker image
+        env:
+          IMAGE_URI: ${{ steps.meta.outputs.IMAGE_URI }}
+        run: |
+          docker build -t "$IMAGE_URI" -t ${{ steps.ecr.outputs.registry }}/${{ env.PROJECT_NAME }}-backend:latest backend
+          docker push "$IMAGE_URI"
+          docker push ${{ steps.ecr.outputs.registry }}/${{ env.PROJECT_NAME }}-backend:latest
+
+      - name: Force new ECS deployment
+        run: |
+          aws ecs update-service \
+            --cluster "${{ env.PROJECT_NAME }}-cluster" \
+            --service "${{ env.PROJECT_NAME }}-service" \
+            --force-new-deployment \
+            --region "${{ env.AWS_REGION }}"
+
+      - name: Wait for service stability (verify running)
+        run: |
+          aws ecs wait services-stable \
+            --cluster "${{ env.PROJECT_NAME }}-cluster" \
+            --services "${{ env.PROJECT_NAME }}-service" \
+            --region "${{ env.AWS_REGION }}"

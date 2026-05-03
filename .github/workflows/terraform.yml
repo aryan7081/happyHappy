@@ -1,0 +1,53 @@
+# Phase 2 — Infrastructure (Terraform): init, validate, plan, apply
+name: Terraform
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "Run terraform apply after plan"
+        type: boolean
+        default: true
+
+env:
+  TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
+  TF_VAR_django_secret_key: ${{ secrets.DJANGO_SECRET_KEY }}
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform fmt -check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan -input=false
+
+      - name: Terraform Apply
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.apply == 'true'
+        run: terraform apply -auto-approve tfplan

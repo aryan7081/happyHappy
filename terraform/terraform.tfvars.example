@@ -1,0 +1,3 @@
+project_name      = "corefit"
+aws_region        = "ap-south-1"
+django_secret_key = "replace-with-a-long-random-string"

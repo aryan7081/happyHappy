@@ -1,0 +1,11 @@
+# Local state (for class / evaluation). For teams, use an S3 backend.
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+crash.log
+override.tf
+override.tf.json
+terraform.tfvars
+*.tfvars
+!terraform.tfvars.example
