@@ -39,7 +39,7 @@ resource "aws_ecs_task_definition" "app" {
   container_definitions = jsonencode([
     {
       name      = "backend"
-      image     = "${aws_ecr_repository.app.repository_url}:latest"
+      image     = "${data.aws_ecr_repository.app.repository_url}:latest"
       essential = true
 
       portMappings = [
