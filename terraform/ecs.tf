@@ -3,45 +3,6 @@ resource "aws_cloudwatch_log_group" "app" {
   retention_in_days = 14
 }
 
-resource "aws_iam_role" "ecs_execution" {
-  name = "${var.project_name}-ecs-exec"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ecs-tasks.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "ecs_execution" {
-  role       = aws_iam_role.ecs_execution.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-}
-
-resource "aws_iam_role" "ecs_task" {
-  name = "${var.project_name}-ecs-task"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ecs-tasks.amazonaws.com"
-        }
-      }
-    ]
-  })
-}
-
 resource "aws_security_group" "ecs_service" {
   name_prefix = "${var.project_name}-ecs-"
   vpc_id      = data.aws_vpc.default.id
@@ -72,8 +33,8 @@ resource "aws_ecs_task_definition" "app" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = "512"
   memory                   = "1024"
-  execution_role_arn       = aws_iam_role.ecs_execution.arn
-  task_role_arn            = aws_iam_role.ecs_task.arn
+  execution_role_arn       = var.ecs_shared_iam_role_arn
+  task_role_arn            = var.ecs_shared_iam_role_arn
 
   container_definitions = jsonencode([
     {
