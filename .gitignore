@@ -1,0 +1,11 @@
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+test-results/
+frontend/coverage/
+backend/htmlcov/
+backend/test-results/
+backend/.coverage
+backend/coverage.xml
+node_modules/

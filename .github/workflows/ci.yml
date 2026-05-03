@@ -25,18 +25,29 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install -r requirements-test.txt
 
       - name: Run linter
         run: flake8 coreFit mysite
 
-      - name: Run tests
+      - name: Run tests with coverage and JUnit report
         env:
           SECRET_KEY: test-key-for-ci
           DEBUG: "True"
           RAZORPAY_KEY_ID: ""
           RAZORPAY_KEY_SECRET: ""
         run: |
-          python manage.py test coreFit --no-input
+          mkdir -p test-results
+          pytest coreFit/tests.py --junitxml=test-results/junit-backend.xml --cov=coreFit --cov-report=xml:coverage.xml --cov-report=term-missing
+
+      - name: Upload backend test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-test-reports
+          path: |
+            backend/test-results/junit-backend.xml
+            backend/coverage.xml
 
   frontend:
     runs-on: ubuntu-latest
@@ -63,7 +74,18 @@ jobs:
       - name: Check formatting
         run: npm run format:check
 
-      - name: Run tests
+      - name: Run tests with coverage and JUnit report
         env:
           CI: true
-        run: npm test -- --watchAll=false --passWithNoTests
+          JEST_JUNIT_OUTPUT_DIR: test-results
+          JEST_JUNIT_OUTPUT_NAME: junit-frontend.xml
+        run: npm run test:ci
+
+      - name: Upload frontend test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-test-reports
+          path: |
+            frontend/test-results/junit-frontend.xml
+            frontend/coverage/
