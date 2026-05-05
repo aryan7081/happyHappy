@@ -4,7 +4,7 @@ output "s3_bucket_id" {
 }
 
 output "ecr_repository_url" {
-  value       = data.aws_ecr_repository.app.repository_url
+  value       = local.ecr_repository_url
   description = "Push Docker images here"
 }
 

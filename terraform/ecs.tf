@@ -39,7 +39,7 @@ resource "aws_ecs_task_definition" "app" {
   container_definitions = jsonencode([
     {
       name      = "backend"
-      image     = "${data.aws_ecr_repository.app.repository_url}:latest"
+      image     = "${local.ecr_repository_url}:latest"
       essential = true
 
       portMappings = [
@@ -83,6 +83,13 @@ resource "aws_ecs_service" "app" {
   task_definition = aws_ecs_task_definition.app.arn
   desired_count   = 1
   launch_type     = "FARGATE"
+
+  lifecycle {
+    precondition {
+      condition     = length(data.aws_subnets.default.ids) > 0
+      error_message = "Default VPC has no subnets; create subnets or set a non-default VPC before deploying ECS."
+    }
+  }
 
   network_configuration {
     subnets          = data.aws_subnets.default.ids
