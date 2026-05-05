@@ -1,12 +1,5 @@
-# CI runs scripts/terraform-adopt-state.sh before plan/apply to import corefit_* resources already in AWS.
+# Copy to terraform.tfvars locally (do not commit secrets).
 
 project_name      = "corefit"
-aws_region        = "ap-south-1"
+aws_region        = "us-east-1"
 django_secret_key = "replace-with-a-long-random-string"
-
-# Let Terraform create / own the ECR repo (set true for greenfield). If repo already existed, import first:
-#   terraform import 'aws_ecr_repository.app[0]' corefit-backend
-# manage_ecr_repository = true
-
-# Optional: override ECS IAM role (defaults to account service-linked style role)
-# ecs_shared_iam_role_arn = "arn:aws:iam::312408089469:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS"

@@ -33,8 +33,8 @@ resource "aws_ecs_task_definition" "app" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = "512"
   memory                   = "1024"
-  execution_role_arn       = var.ecs_shared_iam_role_arn
-  task_role_arn            = var.ecs_shared_iam_role_arn
+  execution_role_arn       = data.aws_iam_role.lab.arn
+  task_role_arn            = data.aws_iam_role.lab.arn
 
   container_definitions = jsonencode([
     {
@@ -58,11 +58,11 @@ resource "aws_ecs_task_definition" "app" {
       ]
 
       healthCheck = {
-        command     = ["CMD-SHELL", "curl -f http://127.0.0.1:8000/api/membership-plans/ || exit 1"]
+        command     = ["CMD-SHELL", "curl -f http://127.0.0.1:8000/api/health/ || exit 1"]
         interval    = 30
         timeout     = 5
         retries     = 3
-        startPeriod = 60
+        startPeriod = 120
       }
 
       logConfiguration = {
@@ -96,4 +96,12 @@ resource "aws_ecs_service" "app" {
     security_groups  = [aws_security_group.ecs_service.id]
     assign_public_ip = true
   }
+
+  deployment_circuit_breaker {
+    enable   = true
+    rollback = true
+  }
+
+  deployment_minimum_healthy_percent = 100
+  deployment_maximum_percent         = 200
 }
