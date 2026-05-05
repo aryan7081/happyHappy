@@ -23,16 +23,18 @@ RUN rm -rf /wheels
 COPY manage.py .
 COPY mysite/ ./mysite/
 COPY coreFit/ ./coreFit/
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-RUN mkdir -p staticfiles media \
-    && chown -R appuser:appuser /app
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
+    && mkdir -p staticfiles media \
+    && chown -R appuser:appuser /app /usr/local/bin/docker-entrypoint.sh
 
 USER appuser
 ENV PYTHONUNBUFFERED=1
 EXPOSE 8000
 
-# Prefer an unauthenticated GET that exists in this API
-HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
-  CMD curl -f http://127.0.0.1:8000/api/membership-plans/ || exit 1
+# DB-free liveness URL; start-period allows first-time migrate + gunicorn boot
+HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \
+  CMD curl -f http://127.0.0.1:8000/api/health/ || exit 1
 
-CMD ["gunicorn", "mysite.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "2"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
