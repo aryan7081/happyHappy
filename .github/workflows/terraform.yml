@@ -1,4 +1,4 @@
-# Phase 2 — Infrastructure (Terraform): init, validate, plan, apply
+# Stand-alone Terraform run (infra-only edits). Normal path is CI/CD Pipeline (ci.yml): tests → plan/apply → docker → ECS.
 name: Terraform
 
 on:

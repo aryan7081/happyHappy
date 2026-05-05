@@ -17,6 +17,12 @@ variable "django_secret_key" {
   sensitive   = true
 }
 
+variable "manage_ecr_repository" {
+  type        = bool
+  description = "If true, Terraform creates the ECR repo (idempotent). If the repo already exists in AWS, run: terraform import 'aws_ecr_repository.app[0]' <repo-name>. If false, Terraform only looks up an existing repo (must already exist)."
+  default     = false
+}
+
 # Shared IAM role for ECS task execution + task (per project policy)
 variable "ecs_shared_iam_role_arn" {
   type        = string

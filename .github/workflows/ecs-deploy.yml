@@ -1,4 +1,4 @@
-# Phase 3 — Docker build, push to ECR, deploy to ECS Fargate
+# Manual image + ECS deploy only. Default path uses CI/CD Pipeline (ci.yml) after Terraform.
 name: ECS Deploy
 
 on:
