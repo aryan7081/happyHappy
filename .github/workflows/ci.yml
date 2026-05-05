@@ -1,6 +1,7 @@
-# Ordered pipeline: Tests → Terraform (plan | apply) → Docker build/push → ECS or EKS deploy
-# PR: tests + Terraform plan only (no apply, no image, no deploy). Push to main/master: full path.
-# Fork PRs: AWS jobs are skipped (no repository secrets on forks).
+# Ordered pipeline: Tests → Terraform (plan | apply on main/master or manual) → Docker build/push → ECS/EKS
+# PR and push to non-deploy branches: tests + Terraform plan only (no apply, no Docker).
+# Deploy runs on: push to main/master, optional extra branch (repo variable DEPLOY_FROM_BRANCH), or workflow_dispatch.
+# Fork PRs: Terraform/Docker skipped (no secrets).
 name: CI / CD Pipeline
 
 concurrency:
@@ -9,7 +10,7 @@ concurrency:
 
 on:
   push:
-    branches: [main, master]
+    branches: ["**"]
   pull_request:
     branches: [main, master]
   workflow_dispatch:
@@ -155,13 +156,38 @@ jobs:
         run: terraform plan -out=tfplan -input=false
 
       - name: Terraform Apply
-        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.terraform_apply == true) }}
+        if: >-
+          ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.terraform_apply == true)
+          || (
+            github.event_name == 'push'
+            && (
+              github.ref == 'refs/heads/main'
+              || github.ref == 'refs/heads/master'
+              || (vars.DEPLOY_FROM_BRANCH != '' && github.ref == format('refs/heads/{0}', vars.DEPLOY_FROM_BRANCH))
+            )
+          ) }}
         run: terraform apply -auto-approve tfplan
 
   docker-build-push-deploy:
     name: Docker build / push and deploy
-    needs: [terraform-infra]
-    if: github.event_name != 'pull_request'
+    needs: [backend, frontend, terraform-infra]
+    # Use always() + needs.*.result so this job is not auto-skipped when a needed job is skipped (fork PRs).
+    if: >-
+      ${{ always()
+      && needs.backend.result == 'success'
+      && needs.frontend.result == 'success'
+      && needs.terraform-infra.result == 'success'
+      && (
+        github.event_name == 'workflow_dispatch'
+        || (
+          github.event_name == 'push'
+          && (
+            github.ref == 'refs/heads/main'
+            || github.ref == 'refs/heads/master'
+            || (vars.DEPLOY_FROM_BRANCH != '' && github.ref == format('refs/heads/{0}', vars.DEPLOY_FROM_BRANCH))
+          )
+        )
+      ) }}
     runs-on: ubuntu-latest
 
     steps:
