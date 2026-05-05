@@ -1,6 +1,6 @@
 # Tests → Terraform → Docker → ECS/EKS.
-# Deploy when: workflow_dispatch OR push to default branch OR push to DEPLOY_FROM_BRANCH OR (internal PR AND DOCKER_DEPLOY_ON_PR=true).
-# Fork PRs: no Terraform/Docker without secrets.
+# Internal (non-fork) PRs run Docker/ECS by default; repo var DOCKER_SKIP_ON_PR=true skips deploy on PRs only.
+# Fork PRs: Terraform/Docker jobs skipped without upstream secrets.
 
 name: CI / CD Pipeline
 
@@ -185,7 +185,7 @@ jobs:
         || (
           github.event_name == 'pull_request'
           && github.event.pull_request.head.repo.fork == false
-          && vars.DOCKER_DEPLOY_ON_PR == 'true'
+          && vars.DOCKER_SKIP_ON_PR != 'true'
         )
         || (
           github.event_name == 'push'
