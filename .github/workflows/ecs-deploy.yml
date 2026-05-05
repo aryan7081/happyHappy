@@ -42,11 +42,30 @@ jobs:
 
       - name: Force new ECS deployment
         run: |
+          CLUSTER="${{ env.PROJECT_NAME }}-cluster"
+          SERVICE="${{ env.PROJECT_NAME }}-service"
+          REGION="${{ env.AWS_REGION }}"
+          FAIL=$(aws ecs describe-services --cluster "$CLUSTER" --services "$SERVICE" --region "$REGION" \
+            --query 'failures[0].reason' --output text 2>/dev/null || echo "DescribeFailed")
+          if [ "$FAIL" = "DescribeFailed" ]; then
+            echo "::error::aws ecs describe-services failed (check cluster $CLUSTER, region, credentials)."
+            exit 1
+          fi
+          if [ "$FAIL" != "None" ] && [ -n "$FAIL" ]; then
+            echo "::error::ECS describe-services: $SERVICE — $FAIL. Recreate with terraform apply (aws_ecs_service.app)."
+            exit 1
+          fi
+          STATUS=$(aws ecs describe-services --cluster "$CLUSTER" --services "$SERVICE" --region "$REGION" \
+            --query 'services[0].status' --output text)
+          if [ "$STATUS" != "ACTIVE" ]; then
+            echo "::error::ECS service $SERVICE status is '$STATUS' (need ACTIVE). Run terraform apply to recreate or wait for DRAINING to complete."
+            exit 1
+          fi
           aws ecs update-service \
-            --cluster "${{ env.PROJECT_NAME }}-cluster" \
-            --service "${{ env.PROJECT_NAME }}-service" \
+            --cluster "$CLUSTER" \
+            --service "$SERVICE" \
             --force-new-deployment \
-            --region "${{ env.AWS_REGION }}"
+            --region "$REGION"
 
       - name: Wait for service stability (verify running)
         run: |

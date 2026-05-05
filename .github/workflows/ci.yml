@@ -244,11 +244,30 @@ jobs:
       - name: Deploy to ECS (Fargate)
         if: ${{ steps.target.outputs.deploy_target != 'eks' }}
         run: |
+          CLUSTER="${{ env.PROJECT_NAME }}-cluster"
+          SERVICE="${{ env.PROJECT_NAME }}-service"
+          REGION="${{ env.AWS_REGION }}"
+          FAIL=$(aws ecs describe-services --cluster "$CLUSTER" --services "$SERVICE" --region "$REGION" \
+            --query 'failures[0].reason' --output text 2>/dev/null || echo "DescribeFailed")
+          if [ "$FAIL" = "DescribeFailed" ]; then
+            echo "::error::aws ecs describe-services failed (check cluster $CLUSTER, region, credentials)."
+            exit 1
+          fi
+          if [ "$FAIL" != "None" ] && [ -n "$FAIL" ]; then
+            echo "::error::ECS describe-services: $SERVICE — $FAIL. Recreate the service with Terraform (job terraform-infra apply creates aws_ecs_service.app). If you removed it from Terraform state, run terraform apply in terraform/."
+            exit 1
+          fi
+          STATUS=$(aws ecs describe-services --cluster "$CLUSTER" --services "$SERVICE" --region "$REGION" \
+            --query 'services[0].status' --output text)
+          if [ "$STATUS" != "ACTIVE" ]; then
+            echo "::error::ECS service $SERVICE status is '$STATUS' (need ACTIVE). Deleted or draining services cannot be updated—run terraform apply to recreate, or wait until DRAINING finishes."
+            exit 1
+          fi
           aws ecs update-service \
-            --cluster "${{ env.PROJECT_NAME }}-cluster" \
-            --service "${{ env.PROJECT_NAME }}-service" \
+            --cluster "$CLUSTER" \
+            --service "$SERVICE" \
             --force-new-deployment \
-            --region "${{ env.AWS_REGION }}"
+            --region "$REGION"
 
       - name: Wait for ECS service stability
         if: ${{ steps.target.outputs.deploy_target != 'eks' }}
