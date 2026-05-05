@@ -10,8 +10,12 @@ on:
         default: true
 
 env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  PROJECT_NAME: corefit
   TF_VAR_aws_region: ${{ secrets.AWS_REGION }}
   TF_VAR_django_secret_key: ${{ secrets.DJANGO_SECRET_KEY }}
+  TF_VAR_manage_ecr_repository: ${{ vars.TF_MANAGE_ECR == 'true' && 'true' || 'false' }}
+  TF_VAR_project_name: corefit
 
 jobs:
   terraform:
@@ -42,6 +46,9 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
+      - name: Adopt existing AWS resources into Terraform state
+        run: bash ../scripts/terraform-adopt-state.sh
+
       - name: Terraform Validate
         run: terraform validate
 
@@ -49,5 +56,5 @@ jobs:
         run: terraform plan -out=tfplan -input=false
 
       - name: Terraform Apply
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.apply == 'true'
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.apply == true }}
         run: terraform apply -auto-approve tfplan

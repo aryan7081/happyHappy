@@ -1,3 +1,5 @@
+# CI runs scripts/terraform-adopt-state.sh before plan/apply to import corefit_* resources already in AWS.
+
 project_name      = "corefit"
 aws_region        = "ap-south-1"
 django_secret_key = "replace-with-a-long-random-string"

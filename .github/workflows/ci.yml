@@ -123,6 +123,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TF_VAR_manage_ecr_repository: ${{ vars.TF_MANAGE_ECR == 'true' && 'true' || 'false' }}
+      TF_VAR_project_name: ${{ env.PROJECT_NAME }}
     defaults:
       run:
         working-directory: terraform
@@ -148,6 +149,9 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+
+      - name: Adopt existing AWS resources into Terraform state
+        run: bash ../scripts/terraform-adopt-state.sh
 
       - name: Terraform Validate
         run: terraform validate
