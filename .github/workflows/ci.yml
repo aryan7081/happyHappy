@@ -1,7 +1,7 @@
-# Ordered pipeline: Tests → Terraform (plan | apply on main/master or manual) → Docker build/push → ECS/EKS
-# PR and push to non-deploy branches: tests + Terraform plan only (no apply, no Docker).
-# Deploy runs on: push to main/master, optional extra branch (repo variable DEPLOY_FROM_BRANCH), or workflow_dispatch.
-# Fork PRs: Terraform/Docker skipped (no secrets).
+# Tests → Terraform → Docker → ECS/EKS.
+# Deploy when: workflow_dispatch OR push to default branch OR push to DEPLOY_FROM_BRANCH OR (internal PR AND DOCKER_DEPLOY_ON_PR=true).
+# Fork PRs: no Terraform/Docker without secrets.
+
 name: CI / CD Pipeline
 
 concurrency:
@@ -12,11 +12,11 @@ on:
   push:
     branches: ["**"]
   pull_request:
-    branches: [main, master]
+    branches: ["**"]
   workflow_dispatch:
     inputs:
       terraform_apply:
-        description: Terraform apply (manual runs; push to main always applies when plan succeeds)
+        description: Terraform apply (manual; push applies only on default or DEPLOY_FROM_BRANCH branches)
         type: boolean
         default: true
       deploy_target:
@@ -161,9 +161,11 @@ jobs:
           || (
             github.event_name == 'push'
             && (
-              github.ref == 'refs/heads/main'
-              || github.ref == 'refs/heads/master'
-              || (vars.DEPLOY_FROM_BRANCH != '' && github.ref == format('refs/heads/{0}', vars.DEPLOY_FROM_BRANCH))
+              github.ref_name == github.event.repository.default_branch
+              || (
+                vars.DEPLOY_FROM_BRANCH != ''
+                && github.ref_name == vars.DEPLOY_FROM_BRANCH
+              )
             )
           ) }}
         run: terraform apply -auto-approve tfplan
@@ -171,7 +173,6 @@ jobs:
   docker-build-push-deploy:
     name: Docker build / push and deploy
     needs: [backend, frontend, terraform-infra]
-    # Use always() + needs.*.result so this job is not auto-skipped when a needed job is skipped (fork PRs).
     if: >-
       ${{ always()
       && needs.backend.result == 'success'
@@ -180,11 +181,18 @@ jobs:
       && (
         github.event_name == 'workflow_dispatch'
         || (
+          github.event_name == 'pull_request'
+          && github.event.pull_request.head.repo.fork == false
+          && vars.DOCKER_DEPLOY_ON_PR == 'true'
+        )
+        || (
           github.event_name == 'push'
           && (
-            github.ref == 'refs/heads/main'
-            || github.ref == 'refs/heads/master'
-            || (vars.DEPLOY_FROM_BRANCH != '' && github.ref == format('refs/heads/{0}', vars.DEPLOY_FROM_BRANCH))
+            github.ref_name == github.event.repository.default_branch
+            || (
+              vars.DEPLOY_FROM_BRANCH != ''
+              && github.ref_name == vars.DEPLOY_FROM_BRANCH
+            )
           )
         )
       ) }}
