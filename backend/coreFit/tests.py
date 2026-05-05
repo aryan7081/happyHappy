@@ -117,3 +117,11 @@ class MembershipPlanAPITest(TestCase):
         response = self.client.get("/api/membership-plans/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertGreaterEqual(len(response.data), 1)
+
+
+class HealthCheckAPITest(TestCase):
+    def test_health_ok_without_db_queries_required(self):
+        client = APIClient()
+        response = client.get("/api/health/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get("status"), "ok")

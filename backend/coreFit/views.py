@@ -15,8 +15,18 @@ from datetime import timedelta
 import razorpay
 from django.conf import settings
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 import uuid
+
+
+class HealthCheckView(APIView):
+    """Liveness: must not depend on DB or external services (ECS / Docker health checks)."""
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request):
+        return Response({"status": "ok"}, status=status.HTTP_200_OK)
+
 
 class SignupView(CreateAPIView):
     serializer_class = SignupSerializer
